@@ -1577,10 +1577,6 @@ int modbus_proxy(modbus_t* master_ctx, modbus_t* slave_ctx, uint8_t* master_req,
     int offset = master_ctx->backend->header_length;
     int slave = master_req[offset - 1];
 
-    /* First check request filter */
-    if (master_ctx->backend->filter_request(master_ctx, slave))
-        return 0;
-
     /* Set slave address */
     modbus_set_slave(slave_ctx, slave);
 
@@ -1605,7 +1601,7 @@ int modbus_proxy(modbus_t* master_ctx, modbus_t* slave_ctx, uint8_t* master_req,
 
     /* Receive the response */
     uint8_t rsp[MAX_MESSAGE_LENGTH];
-    int rsp_length = receive_msg(slave_ctx, rsp, MSG_CONFIRMATION);
+    int rsp_length = _modbus_receive_msg(slave_ctx, rsp, MSG_CONFIRMATION);
     if (rsp_length < 0) {
         if (errno == ETIMEDOUT)
             modbus_reply_exception(master_ctx, master_req, MODBUS_EXCEPTION_GATEWAY_TARGET);
