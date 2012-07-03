@@ -590,12 +590,13 @@ int modbus_tcp_accept(modbus_t *ctx, int *socket)
     socklen_t addrlen;
 
     addrlen = sizeof(addr);
-#ifdef HAVE_ACCEPT4
+    /* accept4 is detected on Debian Squeeze / TS-7800 but returns "Function not implemented" */
+/* #ifdef HAVE_ACCEPT4 */
     /* Inherit socket flags and use accept4 call */
-    ctx->s = accept4(*socket, (struct sockaddr *)&addr, &addrlen, SOCK_CLOEXEC);
-#else
+    /* ctx->s = accept4(*socket, (struct sockaddr *)&addr, &addrlen, SOCK_CLOEXEC);
+#else */
     ctx->s = accept(*socket, (struct sockaddr *)&addr, &addrlen);
-#endif
+/* #endif */
 
     if (ctx->s == -1) {
         close(*socket);
